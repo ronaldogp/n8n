@@ -20,6 +20,10 @@
   .pw-wrap input{flex:1}
   .gen-btn{background:#c74634;color:#fff;border:none;border-radius:6px;padding:0 10px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit}
   .gen-btn:hover{background:#a63a2b}
+  .show-btn{background:#c74634;color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;margin-left:6px;font-family:inherit;vertical-align:middle}
+  .show-btn:hover{background:#a63a2b}
+  @keyframes piscar{0%,100%{background:#fff;border-color:#cbd5e1;box-shadow:none}50%{background:#fde68a;border-color:#c74634;box-shadow:0 0 0 3px rgba(199,70,52,.35)}}
+  .blink{animation:piscar .5s ease-in-out 3}
   .toggle{font-size:12px;cursor:pointer;background:none;border:none;color:#c74634;float:right;padding:2px 0}
   .panel-label{margin:6px 0 0;font-size:11px;font-weight:600;color:#374151}
   #panel-body.is-hidden{display:none}
@@ -222,7 +226,7 @@ const STEPS = [
  ["Quando o domínio não existir, será exibida uma mensagem de sucesso semelhante a esta. Observe que o novo nome é <b>n8n-primo</b>."],
  ["Role a página, apague o IP existente, informe o IP público da Oracle e clique em <b>update ip</b>. Preencha a variável <span class='v'>SUA_NOVA_URL</span> no topo (ex.: n8n-primo.duckdns.org)."],
  ["Agora vamos subir o N8N. Se a conexão tiver caído, conecte novamente ao servidor.", SSH,"bash","conectar.sh"],
- ["Crie o docker-compose do N8N. Copie, cole e execute este comando no terminal.<br><span style=\"color: red; font-weight: bold;\">ATENÇÃO:</span> Antes de executar este comando, verifique se a <span style=\"color: red; font-weight: bold;\">SENHA_DB</span> já foi gerada e se <span style=\"color: red; font-weight: bold;\">SUA_NOVA_URL</span> está preenchida.",
+ ["Crie o docker-compose do N8N. Copie, cole e execute este comando no terminal.<br><span style=\"color: red; font-weight: bold;\">ATENÇÃO:</span> Antes de executar este comando, verifique se a <span style=\"color: red; font-weight: bold;\">SENHA_DB</span> já foi gerada e se <span style=\"color: red; font-weight: bold;\">SUA_NOVA_URL</span> está preenchida.<button type=\"button\" class=\"show-btn\" onclick=\"mostrarPainel()\">Mostrar</button>",
   "mkdir ~/n8n && cd ~/n8n\ncat << 'EOF' > docker-compose.yml\n"+COMPOSE+"\nEOF","yaml","docker-compose.sh"],
  ["Execute os comandos abaixo.","docker compose up -d\ndocker compose logs -f n8n","bash","subir.sh"],
  ["Quando a janela \"congelar\" com esta aparência, já pode fechá-la."],
@@ -304,6 +308,17 @@ function gerarSenha(tam=20){
   while(s.length<tam)s.push(todos[rnd(todos.length)]);
   for(let i=s.length-1;i>0;i--){const j=rnd(i+1);[s[i],s[j]]=[s[j],s[i]]}
   return s.join("");
+}
+
+function mostrarPainel(){
+  document.getElementById("panel-body").classList.remove("is-hidden");
+  ["SENHA_DB","SUA_NOVA_URL"].forEach(v=>{
+    const inp=document.querySelector(`[data-var="${v}"]`);
+    inp.classList.remove("blink");
+    void inp.offsetWidth;
+    inp.classList.add("blink");
+    inp.addEventListener("animationend",()=>inp.classList.remove("blink"),{once:true});
+  });
 }
 
 document.querySelectorAll("[data-sensitive]").forEach(inp=>localStorage.removeItem("var_"+inp.dataset.var));
